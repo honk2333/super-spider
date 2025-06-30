@@ -29,9 +29,23 @@ func main() {
 		os.Exit(1)
 	}
 
-	// 提取资源链接
-	resources := extractResources(content, targetURL)
-	fmt.Printf("发现 %d 个资源\n", len(resources))
+	// 检查是否为直接资源链接
+	resourceType, isDirectResource := getResourceTypeFromURL(targetURL)
+	var resources []Resource
+	if isDirectResource {
+		// 创建直接资源
+		resources = []Resource{
+			{
+				URL:  targetURL,
+				Type: resourceType,
+			},
+		}
+		fmt.Printf("发现直接资源链接: %s\n", targetURL)
+	} else {
+		// 提取资源链接
+		resources = extractResources(content, targetURL)
+		fmt.Printf("发现 %d 个资源\n", len(resources))
+	}
 
 	// 下载资源
 	downloadResources(resources)

@@ -5,24 +5,35 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
 
 // 获取网页内容
 func fetchWebPage(url string) (string, error) {
+	// 检查URL是否为直接资源链接
+	if _, isDirectResource := getResourceTypeFromURL(url); isDirectResource {
+		// 如果是直接资源链接，返回空内容，让调用方处理
+		return "", nil
+	}
+
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
 
+	// 检查响应状态码
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return "", fmt.Errorf("请求失败，状态码: %d", resp.StatusCode)
+	}
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
 
-	// fmt.Println("获取网页内容成功", string(body));
 	return string(body), nil
 }
 
@@ -81,6 +92,61 @@ func extractResources(content, baseURL string) []Resource {
 	resources = append(resources, extractImages(content, baseURL)...)
 	resources = append(resources, extractDocs(content, baseURL)...)
 	return resources
+}
+
+// 根据URL扩展名获取资源类型
+func getResourceTypeFromURL(urlStr string) (string, bool) {
+	// 获取URL中的文件名
+	parsedURL, err := url.Parse(urlStr)
+	if err != nil {
+		return "", false
+	}
+	filename := filepath.Base(parsedURL.Path)
+	ext := strings.ToLower(filepath.Ext(filename))
+	if ext == "" {
+		return "", false
+	}
+	ext = ext[1:] // 去除点号
+
+	// 判断资源类型
+	imageExts := map[string]bool{
+		"jpg":  true,
+		"jpeg": true,
+		"png":  true,
+		"gif":  true,
+		"bmp":  true,
+		"webp": true,
+		"svg":  true,
+		"ico":  true,
+	}
+	videoExts := map[string]bool{
+		"mp4":  true,
+		"avi":  true,
+		"mov":  true,
+		"mkv":  true,
+		"flv":  true,
+		"wmv":  true,
+		"webm": true,
+	}
+	docExts := map[string]bool{
+		"pdf":  true,
+		"doc":  true,
+		"docx": true,
+		"xls":  true,
+		"xlsx": true,
+		"ppt":  true,
+		"pptx": true,
+	}
+
+	if imageExts[ext] {
+		return ResourceTypeImage, true
+	} else if videoExts[ext] {
+		return ResourceTypeVideo, true
+	} else if docExts[ext] {
+		return ResourceTypeDocument, true
+	}
+
+	return "", false
 }
 
 // 解析相对URL为绝对URL

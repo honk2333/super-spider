@@ -32,4 +32,3 @@ func downloadResources(resources []Resource) {
 		fmt.Printf("下载成功: %s\n", outputPath)
 	}
 }
-
