@@ -38,22 +38,22 @@ func FetchWebPage(url string) (string, error) {
 	return string(body), nil
 }
 
-func ExtractVideos(content, baseURL string) []consts.Resource {
+func extractVideos(content, baseURL string) []consts.Resource {
 	// 提取视频链接
 	var Resources []consts.Resource
 	videoRegex := regexp.MustCompile(`<video[^>]+src=["']([^"']+)["']`)
 	videoMatches := videoRegex.FindAllStringSubmatch(content, -1)
 	for _, match := range videoMatches {
-		consts.Resources = append(consts.Resources, consts.Resource{
+		Resources = append(Resources, consts.Resource{
 			URL:  resolveURL(match[1], baseURL),
 			Type: consts.ResourceTypeVideo,
 		})
 	}
-	return consts.Resources
+	return Resources
 }
 
 // https://img.36krcdn.com/hsossms/20250630/v2_b3c7900a541249fc8103a3c8b52344b7@1743780481@ai_oswg912072oswg1053oswg495_img_png~tplv-1marlgjv7f-ai-v3:600:400:600:400:q70.jpg?x-oss-process=image/format,webp
-func ExtractImages(content, baseURL string) []consts.Resource {
+func extractImages(content, baseURL string) []consts.Resource {
 	var Resources []consts.Resource
 
 	// 提取图片链接
@@ -61,13 +61,13 @@ func ExtractImages(content, baseURL string) []consts.Resource {
 	imageMatches := imageRegex.FindAllStringSubmatch(content, -1)
 	for _, match := range imageMatches {
 		fmt.Println("提取图片链接", match[1])
-		consts.Resources = append(consts.Resources, consts.Resource{
+		Resources = append(Resources, consts.Resource{
 			URL:  resolveURL(match[1], baseURL),
 			Type: consts.ResourceTypeImage,
 		})
 	}
 
-	return consts.Resources
+	return Resources
 }
 
 func extractDocs(content, baseURL string) []consts.Resource {
@@ -77,26 +77,26 @@ func extractDocs(content, baseURL string) []consts.Resource {
 	docRegex := regexp.MustCompile(`<a[^>]+href=["']([^"']+.(pdf|doc|docx|xls|xlsx|ppt|pptx))["']`)
 	docMatches := docRegex.FindAllStringSubmatch(content, -1)
 	for _, match := range docMatches {
-		consts.Resources = append(consts.Resources, consts.Resource{
+		Resources = append(Resources, consts.Resource{
 			URL:  resolveURL(match[1], baseURL),
 			Type: consts.ResourceTypeDocument,
 		})
 	}
 
-	return consts.Resources
+	return Resources
 }
 
 // 提取资源链接
-func extract.Resources(content, baseURL string) []consts.Resource {
+func Resources(content, baseURL string) []consts.Resource {
 	var Resources []consts.Resource
-	consts.Resources = append(consts.Resources, extractVideos(content, baseURL)...)
-	consts.Resources = append(consts.Resources, extractImages(content, baseURL)...)
-	consts.Resources = append(consts.Resources, extractDocs(content, baseURL)...)
-	return consts.Resources
+	Resources = append(Resources, extractVideos(content, baseURL)...)
+	Resources = append(Resources, extractImages(content, baseURL)...)
+	Resources = append(Resources, extractDocs(content, baseURL)...)
+	return Resources
 }
 
 // 根据URL扩展名获取资源类型
-func get.ResourceTypeFromURL(urlStr string) (string, bool) {
+func ResourceTypeFromURL(urlStr string) (string, bool) {
 	// 获取URL中的文件名
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
