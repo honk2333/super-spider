@@ -1,3 +1,3 @@
-module github.com/example/super-spider
+module super-spider
 
 go 1.24.4

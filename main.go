@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"super-spider/consts"
+	"super-spider/downloader"
+	"super-spider/parser"
 )
 
 // 主函数
@@ -23,18 +26,18 @@ func main() {
 	}
 
 	// 获取网页内容
-	content, err := fetchWebPage(targetURL)
+	content, err := parser.FetchWebPage(targetURL)
 	if err != nil {
 		fmt.Printf("获取网页内容失败: %v\n", err)
 		os.Exit(1)
 	}
 
 	// 检查是否为直接资源链接
-	resourceType, isDirectResource := getResourceTypeFromURL(targetURL)
-	var resources []Resource
+	resourceType, isDirectResource := parser.GetResourceTypeFromURL(targetURL)
+	var resources []consts.Resource
 	if isDirectResource {
 		// 创建直接资源
-		resources = []Resource{
+		resources = []consts.Resource{
 			{
 				URL:  targetURL,
 				Type: resourceType,
@@ -43,12 +46,12 @@ func main() {
 		fmt.Printf("发现直接资源链接: %s\n", targetURL)
 	} else {
 		// 提取资源链接
-		resources = extractResources(content, targetURL)
+		resources = parser.ExtractResources(content, targetURL)
 		fmt.Printf("发现 %d 个资源\n", len(resources))
 	}
 
 	// 下载资源
-	downloadResources(resources)
+	downloader.DownloadResources(resources)
 
 	fmt.Println("爬取完成")
 }

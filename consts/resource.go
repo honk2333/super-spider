@@ -1,9 +1,9 @@
-package main
+package consts
 
 // 资源类型定义
 const (
-	ResourceTypeVideo = "video"
-	ResourceTypeImage = "image"
+	ResourceTypeVideo    = "video"
+	ResourceTypeImage    = "image"
 	ResourceTypeDocument = "document"
 )
 
