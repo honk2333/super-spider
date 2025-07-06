@@ -14,7 +14,7 @@ import (
 // 获取网页内容
 func FetchWebPage(url string) (string, error) {
 	// 检查URL是否为直接资源链接
-	if _, isDirectconsts.Resource := get.ResourceTypeFromURL(url); isDirectconsts.Resource {
+	if _, isDirectResource := GetResourceTypeFromURL(url); isDirectResource {
 		// 如果是直接资源链接，返回空内容，让调用方处理
 		return "", nil
 	}
@@ -87,7 +87,7 @@ func extractDocs(content, baseURL string) []consts.Resource {
 }
 
 // 提取资源链接
-func Resources(content, baseURL string) []consts.Resource {
+func ExtractResources(content, baseURL string) []consts.Resource {
 	var Resources []consts.Resource
 	Resources = append(Resources, extractVideos(content, baseURL)...)
 	Resources = append(Resources, extractImages(content, baseURL)...)
@@ -96,7 +96,7 @@ func Resources(content, baseURL string) []consts.Resource {
 }
 
 // 根据URL扩展名获取资源类型
-func ResourceTypeFromURL(urlStr string) (string, bool) {
+func GetResourceTypeFromURL(urlStr string) (string, bool) {
 	// 获取URL中的文件名
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
